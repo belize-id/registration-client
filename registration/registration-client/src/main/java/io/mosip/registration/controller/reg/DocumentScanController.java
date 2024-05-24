@@ -4,30 +4,29 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 
+import io.mosip.registration.api.docscanner.DocScannerFacade;
+import io.mosip.registration.api.docscanner.DocScannerUtil;
+import io.mosip.registration.api.docscanner.dto.DocScanDevice;
+import io.mosip.registration.util.control.FxControl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import io.mosip.kernel.core.logger.spi.Logger;
-import io.mosip.registration.api.docscanner.DocScannerFacade;
-import io.mosip.registration.api.docscanner.DocScannerUtil;
-import io.mosip.registration.api.docscanner.dto.DocScanDevice;
 import io.mosip.registration.config.AppConfig;
 import io.mosip.registration.constants.RegistrationConstants;
 import io.mosip.registration.constants.RegistrationUIConstants;
 import io.mosip.registration.context.SessionContext;
 import io.mosip.registration.controller.BaseController;
 import io.mosip.registration.controller.device.ScanPopUpViewController;
+import io.mosip.registration.dto.mastersync.DocumentCategoryDto;
 import io.mosip.registration.dto.packetmanager.DocumentDto;
-import io.mosip.registration.util.control.FxControl;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -45,6 +44,19 @@ import javafx.stage.Stage;
 public class DocumentScanController extends BaseController {
 
 	private static final Logger LOGGER = AppConfig.getLogger(DocumentScanController.class);
+
+	@Autowired
+	private RegistrationController registrationController;
+
+	private String selectedDocument;
+
+	private ComboBox<DocumentCategoryDto> selectedComboBox;
+
+	private VBox selectedDocVBox;
+
+	private Map<String, ComboBox<DocumentCategoryDto>> documentComboBoxes = new HashMap<>();
+
+	private Map<String, VBox> documentVBoxes = new HashMap<>();
 
 	@Autowired
 	private ScanPopUpViewController scanPopUpViewController;
@@ -77,6 +89,8 @@ public class DocumentScanController extends BaseController {
 
 	private List<BufferedImage> scannedPages;
 
+	private List<BufferedImage> docPages;
+
 	@FXML
 	private Label registrationNavlabel;
 
@@ -90,9 +104,17 @@ public class DocumentScanController extends BaseController {
 	private Label biometricExceptionReq;
 
 	@Autowired
+	private Validations validation;
+
+	@Autowired
 	private DocScannerFacade docScannerFacade;
 
 	private String selectedScanDeviceName;
+
+	private ImageView imageView;
+	private Stage primaryStage;
+
+	private String cropDocumentKey;
 
 	private FxControl fxControl;
 
@@ -204,17 +226,20 @@ public class DocumentScanController extends BaseController {
 			return false;
 		}
 
-		if (RegistrationConstants.PDF.equalsIgnoreCase(documentDto.getFormat())) {
-			setScannedPages(DocScannerUtil.pdfToImages(documentDto.getDocument()));
-			return true;
-		} else {
-			InputStream is = new ByteArrayInputStream(documentDto.getDocument());
-			BufferedImage newBi = ImageIO.read(is);
-			List<BufferedImage> list = new LinkedList<>();
-			list.add(newBi);
-			setScannedPages(list);
-			return true;
+		if (documentDto != null) {
+			if(RegistrationConstants.PDF.equalsIgnoreCase(documentDto.getFormat())) {
+				setScannedPages(DocScannerUtil.pdfToImages(documentDto.getDocument()));
+				return true;
+			} else {
+				InputStream is = new ByteArrayInputStream(documentDto.getDocument());
+				BufferedImage newBi = ImageIO.read(is);
+				List<BufferedImage> list = new LinkedList<>();
+				list.add(newBi);
+				setScannedPages(list);
+				return true;
+			}
 		}
+		return false;
 	}
 
 

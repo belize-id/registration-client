@@ -1,22 +1,18 @@
 package io.mosip.registration.api.docscanner;
 
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import io.micrometer.core.annotation.Timed;
+import io.mosip.registration.api.docscanner.dto.DocScanDevice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import io.micrometer.core.annotation.Timed;
-import io.mosip.registration.api.docscanner.dto.DocScanDevice;
+import java.awt.image.BufferedImage;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class DocScannerFacade {

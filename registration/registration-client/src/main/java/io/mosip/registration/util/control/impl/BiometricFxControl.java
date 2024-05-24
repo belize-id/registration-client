@@ -189,11 +189,11 @@ public class BiometricFxControl extends FxControl {
 	private GridPane createGridPane() {
 		GridPane gridPane = new GridPane();
 		
-		gridPane.setPadding(new Insets(50, 0, 0, 0));
+		gridPane.setPadding(new Insets(12, 0, 0, 0));
 		RowConstraints topRowConstraints = new RowConstraints();
-		topRowConstraints.setPercentHeight(5);
+		topRowConstraints.setPercentHeight(4);
 		RowConstraints midRowConstraints = new RowConstraints();
-		midRowConstraints.setPercentHeight(95);
+		midRowConstraints.setPercentHeight(96);
 		gridPane.getRowConstraints().addAll(topRowConstraints,midRowConstraints);
 
 		ColumnConstraints columnConstraint1 = new ColumnConstraints();
@@ -471,6 +471,10 @@ public class BiometricFxControl extends FxControl {
 			Optional<BiometricsDto> bestCopy = capturedData.stream().sorted(Comparator.comparingDouble(BiometricsDto::getQualityScore)).findFirst();
 			image = biometricsController.getBioStreamImage(uiFieldDTO.getId(), modality,
 					bestCopy.isPresent() ? bestCopy.get().getNumOfRetries() : 1);
+			if(modality.equals(Modality.FACE) && getRegistrationDTo().getSelectedFaceAttempt() != null) {
+				image = biometricsController.getBioStreamImage(uiFieldDTO.getId(), modality,
+						getRegistrationDTo().getSelectedFaceAttempt());
+			}
 		} else {
 			image = biometricsController.getBioStreamImage(uiFieldDTO.getId(), modality, 0);
 		}

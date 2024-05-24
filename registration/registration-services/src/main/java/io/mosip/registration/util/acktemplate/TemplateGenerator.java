@@ -95,6 +95,7 @@ public class TemplateGenerator extends BaseService {
 	 */
 	private static final Logger LOGGER = AppConfig.getLogger(TemplateGenerator.class);
 	private static final String APPLICATION_DATE_FORMAT_CONFIG = "mosip.registration.application_date_format";
+	private static final String APPLICATION_IMPORTANT_GUIDELINES = "mosip.registration.important_guidelines_";
 
 	@Autowired
 	private QrCodeGenerator<QrVersion> qrCodeGenerator;
@@ -341,7 +342,7 @@ public class TemplateGenerator extends BaseService {
 		return data;
 	}
 
-	private String getFieldLabel(UiFieldDTO field) {
+	private Object getFieldLabel(UiFieldDTO field) {
 		List<String> labels = new ArrayList<>();
 		List<String> selectedLanguages = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant();
 		for (String selectedLanguage : selectedLanguages) {
@@ -358,14 +359,9 @@ public class TemplateGenerator extends BaseService {
 		String value = getValue(registration.getDemographics().get(field.getId()));
 		if (value != null && !value.isEmpty()) {
 			data = new HashMap<>();
-			String fieldLabel = getFieldLabel(field);
-			String fieldValue = getFieldValue(field);
-			data.put("label", fieldLabel);
-			data.put("value", fieldValue);
-
-			//Added for backward compatibility(1.1.5.5 & 1.1.4.*), this support will be removed from next version
-			data.put("primaryLabel", fieldLabel);
-			data.put("primaryValue", fieldValue);
+			data.put("label", getFieldLabel(field));
+			data.put("value", getFieldValue(field));
+			//data.put("secondaryValue", getSecondaryLanguageValue(registration.getDemographics().get(field.getId())));
 		}
 		return data;
 	}
@@ -399,6 +395,7 @@ public class TemplateGenerator extends BaseService {
 			templateValues.put(RegistrationConstants.TEMPLATE_REG_CENTER_LABEL, getLabel("registrationcenter"));
 			templateValues.put(RegistrationConstants.TEMPLATE_REG_CENTER, SessionContext.userContext().getRegistrationCenterDetailDTO().getRegistrationCenterName());
 			templateValues.put(RegistrationConstants.TEMPLATE_IMPORTANT_GUIDELINES, firstLanguageProperties.getString("importantguidelines"));
+			setUpImportantGuidelines(templateValues);
 
 			templateValues.put(RegistrationConstants.TEMPLATE_DEMO_INFO, getLabel("demographicInformation"));
 			templateValues.put(RegistrationConstants.TEMPLATE_DOCUMENTS_LABEL, getLabel("documents"));
@@ -533,6 +530,13 @@ public class TemplateGenerator extends BaseService {
 			LOGGER.error(LOG_TEMPLATE_GENERATOR, APPLICATION_NAME, APPLICATION_ID, ExceptionUtils.getStackTrace(exception));
 			throw  new RegBaseCheckedException(RegistrationConstants.TEMPLATE_GENERATOR_ACK_RECEIPT_EXCEPTION, exception.getMessage());
 		}
+	}
+
+	private void setUpImportantGuidelines(Map<String, Object> templateValues) {
+		String guidelines = ApplicationContext.getStringValueFromApplicationMap(APPLICATION_IMPORTANT_GUIDELINES + ApplicationContext.applicationLanguage());
+		String[] importantGuidelines = guidelines!=null ?
+				guidelines.split(RegistrationConstants.DELIMITER) : new String[]{};
+		templateValues.put(RegistrationConstants.TEMPLATE_GUIDELINES, Arrays.asList(importantGuidelines));
 	}
 
 	@SuppressWarnings("unchecked")

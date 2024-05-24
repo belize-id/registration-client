@@ -2,8 +2,7 @@ package io.mosip.registration.dao.impl;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import javax.validation.constraints.NotNull;
 

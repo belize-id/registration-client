@@ -311,7 +311,9 @@ public class MosipDeviceSpecificationFactory {
 
 			if (getMdsProvider(deviceSpecificationProviders, latestSpecVersion) == null) {
 				List<String> specVersions = Arrays.asList(specVersion);
-				    specVersions.remove(latestSpecVersion);    //NOSONAR removing latestSpecVersion here.
+
+				specVersions.remove(latestSpecVersion);
+
 				if (!specVersions.isEmpty()) {
 					latestSpecVersion = getLatestSpecVersion(specVersions.toArray(new String[0]));
 				}

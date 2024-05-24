@@ -3,12 +3,7 @@ package io.mosip.registration.controller.device;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +27,10 @@ import io.mosip.registration.constants.RegistrationUIConstants;
 import io.mosip.registration.context.ApplicationContext;
 import io.mosip.registration.context.SessionContext;
 import io.mosip.registration.controller.BaseController;
+import io.mosip.registration.controller.FXUtils;
+import io.mosip.registration.controller.GenericController;
+import io.mosip.registration.controller.reg.DocumentScanController;
+import io.mosip.registration.controller.reg.RegistrationController;
 import io.mosip.registration.dao.UserDetailDAO;
 import io.mosip.registration.dto.packetmanager.BiometricsDto;
 import io.mosip.registration.entity.UserBiometric;
@@ -161,12 +160,20 @@ public class GenericBiometricsController extends BaseController {
 	@FXML
 	private Label captureTimeValue;
 
+	/** The registration controller. */
+	@Autowired
+	private RegistrationController registrationController;
+
 	/** The iris facade. */
 	@Autowired
 	private BioService bioService;
 
 	@Autowired
 	private BaseService baseService;
+
+	private String bioValue;
+
+	private FXUtils fxUtils;
 
 	public ImageView getBiometricImage() {
 		return biometricImage;
@@ -198,6 +205,12 @@ public class GenericBiometricsController extends BaseController {
 	@FXML
 	private GridPane parentProgressPane;
 
+	@Autowired
+	private DocumentScanController documentScanController;
+
+	@Autowired
+	private GenericController genericController;
+
 	private Service<List<BiometricsDto>> rCaptureTaskService;
 
 	private Service<MdmBioDevice> deviceSearchTask;
@@ -205,6 +218,8 @@ public class GenericBiometricsController extends BaseController {
 	public Modality getCurrentModality() {
 		return currentModality;
 	}
+
+	private Node exceptionVBox;
 
 	private BiometricFxControl fxControl;
 
@@ -277,6 +292,7 @@ public class GenericBiometricsController extends BaseController {
 		checkBoxPane.getChildren().clear();
 
 		// get List of captured Biometrics based on nonExceptionBio Attributes
+		List<BiometricsDto> capturedBiometrics = null;
 		List<String> nonExceptionBioAttributes = isFace(modality) ? RegistrationConstants.faceUiAttributes : null;
 		if (!isFace(modality) && !isExceptionPhoto(modality)) {
 			setExceptionImg();
@@ -811,6 +827,9 @@ public class GenericBiometricsController extends BaseController {
 
 		// Get the stream image from Bio ServiceImpl and load it in the image pane
 		biometricImage.setImage(getBioStreamImage(fieldId, modality, retry));
+		if(modality.equals(Modality.FACE) && getRegistrationDTOFromSession().getSelectedFaceAttempt() != null) {
+			biometricImage.setImage(getBioStreamImage(fieldId, modality, getRegistrationDTOFromSession().getSelectedFaceAttempt()));
+		}
 	}
 
 
@@ -830,6 +849,7 @@ public class GenericBiometricsController extends BaseController {
 	private void updateBiometric(Modality bioType, String bioImage, double biometricThreshold, int retryCount) {
 		LOGGER.info("Updating biometrics and clearing previous data");
 
+		bioValue = bioType.name();
 		try {
 			biometricImage.setImage(getImage(bioImage,true));
 		} catch (RegBaseCheckedException e) {
@@ -940,10 +960,17 @@ public class GenericBiometricsController extends BaseController {
 
 					double qualityScoreVal = getBioScores(fxControl.getUiSchemaDTO().getId(), currentModality, attempt);
 					//if (qualityScoreVal != 0) {
-					updateByAttempt(qualityScoreVal, getBioStreamImage(fxControl.getUiSchemaDTO().getId(), currentModality, attempt),
-							bioService.getMDMQualityThreshold(currentModality), biometricImage,
-							qualityText, bioProgress);
+						updateByAttempt(qualityScoreVal, getBioStreamImage(fxControl.getUiSchemaDTO().getId(), currentModality, attempt),
+								bioService.getMDMQualityThreshold(currentModality), biometricImage,
+								qualityText, bioProgress);
 					//}
+
+					if(isFace(currentModality)) {
+						String key = String.format("%s_%s", currentModality.name().toLowerCase(Locale.ROOT), attempt);
+						getRegistrationDTOFromSession().setSelectedFaceAttempt(attempt);
+						getRegistrationDTOFromSession().addBiometric(fxControl.getUiSchemaDTO().getId(), currentModality.name().toLowerCase(Locale.ROOT), getRegistrationDTOFromSession().getFaceBiometrics().get(key));
+						fxControl.refreshModalityButton(currentModality);
+					}
 
 					LOGGER.info("Mouse Event by attempt Ended. modality : {}", currentModality);
 

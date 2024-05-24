@@ -22,6 +22,7 @@ import io.mosip.registration.controller.BaseController;
 import io.mosip.registration.controller.reg.DocumentScanController;
 import io.mosip.registration.util.common.RectangleSelection;
 import javafx.application.Platform;
+import io.mosip.registration.util.control.FxControl;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
@@ -122,6 +123,7 @@ public class ScanPopUpViewController extends BaseController implements Initializ
 	private Thread streamer_thread = null;
 	private Stage popupStage;
 	public TextField streamerValue;
+	private FxControl fxControl;
 	private boolean isWebCamStream;
 	private boolean isStreamPaused;
 	public DocScanDevice docScanDevice;
@@ -413,7 +415,7 @@ public class ScanPopUpViewController extends BaseController implements Initializ
 				scanImage.setImage(null);
 
 				initializeDocPages(0, 0);
-
+				getImageGroup().getChildren().clear();
 				previewOption.setVisible(false);
 
 			}

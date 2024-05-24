@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import io.mosip.registration.controller.ClientApplication;
+import javafx.geometry.Insets;
 import org.springframework.context.ApplicationContext;
 
 import io.mosip.kernel.core.logger.spi.Logger;

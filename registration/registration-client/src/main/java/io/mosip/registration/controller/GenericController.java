@@ -1,33 +1,11 @@
 package io.mosip.registration.controller;
 
-import static io.mosip.registration.constants.RegistrationConstants.EMPTY;
-import static io.mosip.registration.constants.RegistrationConstants.HASH;
-import static io.mosip.registration.constants.RegistrationConstants.REG_AUTH_PAGE;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-
+import io.mosip.commons.packet.dto.packet.SimpleDto;
 import io.mosip.kernel.core.idvalidator.exception.InvalidIDException;
 import io.mosip.kernel.core.idvalidator.spi.PridValidator;
 import io.mosip.kernel.core.logger.spi.Logger;
 import io.mosip.registration.config.AppConfig;
-import io.mosip.registration.constants.AuditEvent;
-import io.mosip.registration.constants.AuditReferenceIdTypes;
-import io.mosip.registration.constants.Components;
-import io.mosip.registration.constants.ProcessNames;
-import io.mosip.registration.constants.RegistrationConstants;
-import io.mosip.registration.constants.RegistrationUIConstants;
+import io.mosip.registration.constants.*;
 import io.mosip.registration.context.ApplicationContext;
 import io.mosip.registration.context.SessionContext;
 import io.mosip.registration.controller.auth.AuthenticationController;
@@ -45,16 +23,9 @@ import io.mosip.registration.exception.RegBaseCheckedException;
 import io.mosip.registration.exception.RegistrationExceptionConstants;
 import io.mosip.registration.service.sync.PreRegistrationDataSyncService;
 import io.mosip.registration.util.control.FxControl;
-import io.mosip.registration.util.control.impl.BiometricFxControl;
-import io.mosip.registration.util.control.impl.ButtonFxControl;
-import io.mosip.registration.util.control.impl.CheckBoxFxControl;
-import io.mosip.registration.util.control.impl.DOBAgeFxControl;
-import io.mosip.registration.util.control.impl.DOBFxControl;
-import io.mosip.registration.util.control.impl.DocumentFxControl;
-import io.mosip.registration.util.control.impl.DropDownFxControl;
-import io.mosip.registration.util.control.impl.HtmlFxControl;
-import io.mosip.registration.util.control.impl.TextFieldFxControl;
+import io.mosip.registration.util.control.impl.*;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
@@ -63,25 +34,25 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import static io.mosip.registration.constants.RegistrationConstants.*;
 
 /**
  * {@code GenericController} is to capture the demographic/demo/Biometric
@@ -93,7 +64,7 @@ import lombok.SneakyThrows;
  */
 
 @Controller
-public class GenericController extends BaseController {
+public class GenericController<uiFieldDTO> extends BaseController {
 
 	protected static final Logger LOGGER = AppConfig.getLogger(GenericController.class);
 
@@ -134,6 +105,8 @@ public class GenericController extends BaseController {
 	
 	private ProgressIndicator progressIndicator;
 
+	private TextField registrationNumberTextField;
+
 	@Autowired
 	private AuthenticationController authenticationController;
 
@@ -148,7 +121,10 @@ public class GenericController extends BaseController {
 
 	@Autowired
 	private PreRegistrationDataSyncService preRegistrationDataSyncService;
-	
+
+	@Autowired
+	private QrCodePopUpViewController qrCodePopUpViewController;
+
 	private static TreeMap<Integer, UiScreenDTO> orderedScreens = new TreeMap<>();
 	private static Map<String, FxControl> fxControlMap = new HashMap<String, FxControl>();
 	private Stage keyboardStage;
@@ -159,14 +135,21 @@ public class GenericController extends BaseController {
 	public static Map<String, TreeMap<Integer, String>> currentHierarchyMap = new HashMap<String, TreeMap<Integer, String>>();
 	public static List<UiFieldDTO> fields = new ArrayList<>();
 
+	public GenericController() {
+	}
+
 	public static Map<String, FxControl> getFxControlMap() {
 		return fxControlMap;
 	}
-	
+
+	public TextField getRegistrationNumberTextField() {
+		return registrationNumberTextField;
+	}
+
 	public void disableAuthenticateButton(boolean disable) {
 		authenticate.setDisable(disable);
 	}
-	
+
 	private void initialize(RegistrationDTO registrationDTO) {
 		orderedScreens.clear();
 		fxControlMap.clear();
@@ -198,18 +181,33 @@ public class GenericController extends BaseController {
 		hBox.setAlignment(Pos.CENTER_LEFT);
 		hBox.setSpacing(20);
 		hBox.setPrefHeight(100);
-		hBox.setPrefWidth(200);
+		hBox.getStyleClass().add(RegistrationConstants.DEMOGRAPHIC_GROUP);
+		hBox.setPadding(new Insets(20, 0, 20, 0));
 
 		Label label = new Label();
 		label.getStyleClass().add(LABEL_CLASS);
 		label.setId("preRegistrationLabel");
-		label.setText(ApplicationContext.getBundle(langCode, RegistrationConstants.LABELS)
-				.getString("search_for_Pre_registration_id"));
+		List<String> labels = new ArrayList<>();
+		getRegistrationDTOFromSession().getSelectedLanguagesByApplicant().forEach(lCode -> {
+			labels.add(ApplicationContext.getBundle(lCode, RegistrationConstants.LABELS)
+					.getString("search_for_Pre_registration_id"));
+		});
+		String labelText = String.join(RegistrationConstants.SLASH, labels);
+		label.setText(labelText);
+		label.getStyleClass().add(RegistrationConstants.DEMOGRAPHIC_GROUP_LABEL);
+		label.setPadding(new Insets(0, 0, 0, 55));
 		hBox.getChildren().add(label);
+
+		HBox innerHBox = new HBox();
+		innerHBox.setAlignment(Pos.CENTER_LEFT);
+		innerHBox.setSpacing(0);
+		innerHBox.setPrefHeight(100);
+
 		TextField textField = new TextField();
 		textField.setId("preRegistrationId");
 		textField.getStyleClass().add(TEXTFIELD_CLASS);
-		hBox.getChildren().add(textField);
+		this.registrationNumberTextField = textField;
+
 		Button button = new Button();
 		button.setId("fetchBtn");
 		button.getStyleClass().add("demoGraphicPaneContentButton");
@@ -220,7 +218,26 @@ public class GenericController extends BaseController {
 			executePreRegFetchTask(textField);
 		});
 
+		if(RegistrationConstants.ENABLE.equalsIgnoreCase((String) ApplicationContext.map()
+				.getOrDefault(RegistrationConstants.REGCLIENT_QR_CODE_SCAN_ENABLE, RegistrationConstants.ENABLE))) {
+			Button scanQRbutton = new Button();
+			scanQRbutton.setId("scanQRBtn");
+			scanQRbutton.setGraphic(new ImageView(
+					new Image(this.getClass().getResourceAsStream(RegistrationConstants.QR_CODE), 25, 25, true, true)));
+			scanQRbutton.getStyleClass().add("demoGraphicPaneContentButton");
+			scanQRbutton.setOnAction(event -> {
+				executeQRCodeScan();
+			});
+
+			innerHBox.getChildren().add(scanQRbutton);
+		}
+
+		innerHBox.getChildren().add(textField);
+
+		hBox.getChildren().add(innerHBox);
 		hBox.getChildren().add(button);
+
+
 		progressIndicator = new ProgressIndicator();
 		progressIndicator.setId("progressIndicator");
 		progressIndicator.setVisible(false);
@@ -228,7 +245,47 @@ public class GenericController extends BaseController {
 		return hBox;
 	}
 
-	private void executePreRegFetchTask(TextField textField) {
+	private void executeQRCodeScan() {
+		genericScreen.setDisable(true);
+
+		Service<Void> taskService = new Service<Void>() {
+			@Override
+			protected Task<Void> createTask() {
+				return new Task<Void>() {
+					/*
+					 * (non-Javadoc)
+					 *
+					 * @see javafx.concurrent.Task#call()
+					 */
+					@Override
+					protected Void call() {
+						Platform.runLater(() -> {
+							qrCodePopUpViewController.init(RegistrationUIConstants.getMessageLanguageSpecific(RegistrationUIConstants.SCAN_QR_CODE_TITLE));
+						});
+						return null;
+					}
+				};
+			}
+		};
+
+		taskService.start();
+		taskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent workerStateEvent) {
+				genericScreen.setDisable(false);
+			}
+		});
+		taskService.setOnFailed(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent t) {
+				LOGGER.debug("QR code scan failed");
+				genericScreen.setDisable(false);
+			}
+		});
+
+	}
+
+	protected void executePreRegFetchTask(TextField textField) {
 		genericScreen.setDisable(true);
 		progressIndicator.setVisible(true);
 
@@ -377,10 +434,11 @@ public class GenericController extends BaseController {
 							fxControl.selectAndSet(getRegistrationDTOFromSession().getDocuments().get(field.getId()));
 							break;
 						default:
-							fxControl.selectAndSet(getRegistrationDTOFromSession().getDemographics().get(field.getId()));
+							var demographicsCopy = (Map<String, Object>)SessionContext.map().get(RegistrationConstants.REGISTRATION_DATA_DEMO);
+							fxControl.selectAndSet(getRegistrationDTOFromSession().getDemographics().get(field.getId()) != null ? getRegistrationDTOFromSession().getDemographics().get(field.getId()) : demographicsCopy.get(field.getId()));
 							//it will read data from field components and set it in registrationDTO along with selectedCodes and ageGroups
-							//kind of supporting data
-							fxControl.setData(getRegistrationDTOFromSession().getDemographics().get(field.getId()));
+                            //kind of supporting data
+                            fxControl.setData(getRegistrationDTOFromSession().getDemographics().get(field.getId()) != null ? getRegistrationDTOFromSession().getDemographics().get(field.getId()) : demographicsCopy.get(field.getId()));
 							break;
 					}
 				}
@@ -395,7 +453,7 @@ public class GenericController extends BaseController {
 		});
 	}
 
-	private Map<String, List<UiFieldDTO>> getFieldsBasedOnAlignmentGroup(List<UiFieldDTO> screenFields) {
+	private <uiFieldDTO> Map<String, List<UiFieldDTO>> getFieldsBasedOnAlignmentGroup(List<UiFieldDTO> screenFields) {
 		Map<String, List<UiFieldDTO>> groupedScreenFields = new LinkedHashMap<>();
 		if(screenFields == null || screenFields.isEmpty())
 			return groupedScreenFields;
@@ -410,15 +468,20 @@ public class GenericController extends BaseController {
 		}
 
 		screenFields.forEach( field -> {
-				String alignmentGroup = field.getAlignmentGroup() == null ? field.getId()+"TemplateGroup"
-						: field.getAlignmentGroup();
+			List<String> labels = new ArrayList<>();
+			getRegistrationDTOFromSession().getSelectedLanguagesByApplicant().forEach(lCode -> {
+				if(field.getAlignmentGroupLabel() != null)
+					labels.add(field.getAlignmentGroupLabel().get(lCode));
+			});
+			String titleText = String.join(RegistrationConstants.SLASH, labels);
+			String alignmentGroup = field.getAlignmentGroup() == null ? field.getId()+"TemplateGroup" : titleText;
 
-				if(field.isInputRequired()) {
-					if(!groupedScreenFields.containsKey(alignmentGroup))
-						groupedScreenFields.put(alignmentGroup, new LinkedList<UiFieldDTO>());
+			if(field.isInputRequired()) {
+				if(!groupedScreenFields.containsKey(alignmentGroup))
+					groupedScreenFields.put(alignmentGroup, new LinkedList<UiFieldDTO>());
 
-					groupedScreenFields.get(alignmentGroup).add(field);
-				}
+				groupedScreenFields.get(alignmentGroup).add(field);
+			}
 		});
 		return groupedScreenFields;
 	}
@@ -746,21 +809,55 @@ public class GenericController extends BaseController {
 			}
 
 			for(Entry<String, List<UiFieldDTO>> groupEntry : screenFieldGroups.entrySet()) {
-				FlowPane groupFlowPane = new FlowPane();
+				GridPane groupFlowPane = new GridPane();
 				groupFlowPane.prefWidthProperty().bind(gridPane.widthProperty());
 				groupFlowPane.setHgap(20);
 				groupFlowPane.setVgap(20);
 
+				if(screenDTO.getName().equals("DemographicDetails")) {
+					groupFlowPane.getStyleClass().add(RegistrationConstants.DEMOGRAPHIC_GROUP);
+					groupFlowPane.setPadding(new Insets(20, 0, 20, 0));
+
+					ColumnConstraints leftColumn = new ColumnConstraints();
+					leftColumn.setPercentWidth(50);
+					ColumnConstraints rightColumn = new ColumnConstraints();
+					rightColumn.setPercentWidth(50);
+					groupFlowPane.getColumnConstraints().addAll(leftColumn, rightColumn);
+
+					/* Adding Group label */
+					Label label = new Label(groupEntry.getKey());
+					label.getStyleClass().add(RegistrationConstants.DEMOGRAPHIC_GROUP_LABEL);
+					label.setPadding(new Insets(0, 0, 0, 55));
+					groupFlowPane.add(label, 0, 0, 2, 1);
+				}
+				int fieldIndex=0;
 				for(UiFieldDTO fieldDTO : groupEntry.getValue()) {
 					try {
 						FxControl fxControl = buildFxElement(fieldDTO);
 						if(fxControl.getNode() instanceof GridPane) {
 							((GridPane)fxControl.getNode()).prefWidthProperty().bind(groupFlowPane.widthProperty());
 						}
-						groupFlowPane.getChildren().add(fxControl.getNode());
+
+						if(screenDTO.getName().equals("DemographicDetails")) {
+							fxControl.getNode().getStyleClass().add(RegistrationConstants.DEMOGRAPHIC_FIELD);
+							groupFlowPane.add( fxControl.getNode(), (fieldIndex % 2), (fieldIndex / 2) + 1);
+							fieldIndex++;
+						} else {
+							if(screenDTO.getName().equals("Documents")) {
+								fxControl.getNode().getStyleClass().add(RegistrationConstants.DOCUMENT_COMBOBOX_FIELD);
+							}
+							groupFlowPane.getChildren().add(fxControl.getNode());
+						}
 					} catch (Exception exception){
 						LOGGER.error("Failed to build control " + fieldDTO.getId(), exception);
 					}
+				}
+				//Hide introducer grouping for adults
+				if(groupEntry.getKey().equals("Introducer")) {
+					groupFlowPane.visibleProperty().bind(Bindings.or(
+							groupFlowPane.getChildren().get(1).visibleProperty(),
+							groupFlowPane.getChildren().get(2).visibleProperty())
+					);
 				}
 				gridPane.add(groupFlowPane, 0, rowIndex++);
 			}
@@ -773,6 +870,18 @@ public class GenericController extends BaseController {
 			screenTab.setContent(scrollPane);
 			tabPane.getTabs().add(screenTab);
 		}
+
+		//Setting the Default Value
+		/*String langCode = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant().get(0);
+		getRegistrationDTOFromSession().addDemographicField("bloodType", Arrays.asList(new SimpleDto(langCode, "A")));
+		getRegistrationDTOFromSession().addDemographicField("homeless", Arrays.asList(new SimpleDto(langCode, "Yes")));
+		getRegistrationDTOFromSession().addDemographicField("residenceStatus", Arrays.asList(new SimpleDto(langCode, "Non-Foreigner")));
+		getRegistrationDTOFromSession().addDemographicField("state", Arrays.asList(new SimpleDto(langCode, "Karnataka")));
+		getRegistrationDTOFromSession().addDemographicField("city", Arrays.asList(new SimpleDto(langCode, "Bengaluru")));
+		getRegistrationDTOFromSession().addDemographicField("city", Arrays.asList(new SimpleDto(langCode, "BLR"), new SimpleDto("fra", "BLR")));
+		getRegistrationDTOFromSession().addDemographicField("locality", Arrays.asList(new SimpleDto(langCode, "Electronics City")));
+		getRegistrationDTOFromSession().addDemographicField("postalCode","560100");
+		loadDefaultReg();*/
 
 		//refresh to reflect the initial visibility configuration
 		refreshFields();
@@ -917,12 +1026,57 @@ public class GenericController extends BaseController {
 			throw  new Exception("Failed to build fxControl");
 
 		fxControlMap.put(uiFieldDTO.getId(), fxControl);
+
+		fxControl.getNode().addEventHandler(MouseEvent.MOUSE_EXITED, event ->
+				handleContinueButton());
 		return fxControl;
 	}
 
 	public void refreshFields() {
 		orderedScreens.values().forEach(screen -> { refreshScreenVisibility(screen.getName()); });
 	}
+	/*private void loadDefaultReg() {
+		for (UiScreenDTO screenDTO : orderedScreens.values()) {
+			for (UiFieldDTO field : screenDTO.getFields()) {
+				FxControl fxControl = getFxControl(field.getId());
+				if (fxControl != null) {
+					switch (fxControl.getUiSchemaDTO().getType()) {
+						case "biometricsType":
+							break;
+						case "documentType":
+							fxControl.selectAndSet(getRegistrationDTOFromSession().getDocuments().get(field.getId()));
+							break;
+						default:
+							fxControl.selectAndSet(getRegistrationDTOFromSession().getDemographics().get(field.getId()));
+							//it will read data from field components and set it in registrationDTO along with selectedCodes and ageGroups
+							//kind of supporting data
+							fxControl.setData(getRegistrationDTOFromSession().getDemographics().get(field.getId()));
+							break;
+					}
+				}
+			}
+		}
+	}*/
+	public void handleContinueButton() {
+		TabPane tabPane = (TabPane) anchorPane.lookup(HASH+getRegistrationDTOFromSession().getRegistrationId());
+		int selectedIndex = tabPane.getSelectionModel().getSelectedIndex();
+
+		var screenName = tabPane.getTabs().get(selectedIndex).getId().replace("_tab", EMPTY);
+		Optional<UiScreenDTO> result = orderedScreens.values()
+				.stream().filter(screen -> screen.getName().equals(screenName.replace("_tab", EMPTY))).findFirst();
+
+		if(result.isPresent()) {
+			boolean isValid = true;
+			for (UiFieldDTO field : result.get().getFields()) {
+				if (getFxControl(field.getId()) != null && !getFxControl(field.getId()).canContinue()) {
+					isValid = false;
+					break;
+				}
+			}
+			this.next.setDisable(!isValid);
+		}
+	}
+
 
 	/*public List<UiFieldDTO> getProofOfExceptionFields() {
 		return fields.stream().filter(field ->

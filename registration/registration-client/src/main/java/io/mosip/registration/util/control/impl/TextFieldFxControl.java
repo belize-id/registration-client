@@ -9,6 +9,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import io.mosip.registration.controller.*;
+import javafx.geometry.Insets;
+import javafx.scene.layout.*;
 import org.springframework.context.ApplicationContext;
 
 import io.mosip.commons.packet.dto.packet.SimpleDto;
@@ -235,6 +237,7 @@ public class TextFieldFxControl extends FxControl {
 
 		fieldTitle.setText(String.join(RegistrationConstants.SLASH, labels)	+ getMandatorySuffix(uiFieldDTO));
 		simpleTypeVBox.getChildren().add(vBox);
+        simpleTypeVBox.setMargin(vBox, new Insets(0, 30, 0, 0));
 		return simpleTypeVBox;
 	}
 	
@@ -294,7 +297,7 @@ public class TextFieldFxControl extends FxControl {
 	private HBox createTextBox(String langCode, boolean isSimpleType) {
 		HBox textFieldHBox = new HBox();
 		TextField textField = getTextField(langCode, uiFieldDTO.getId() + langCode, false);
-		textField.setMinWidth(400);
+		textFieldHBox.setHgrow(textField, Priority.ALWAYS);
 		textFieldHBox.getChildren().add(textField);
 
 		if(isSimpleType) {
