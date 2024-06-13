@@ -159,7 +159,7 @@ public class RegistrationDTO {
 		return (String)AGE_GROUPS.getOrDefault("ageGroup", null);
 	}
 	public int getAge() {
-		return (int) AGE_GROUPS.getOrDefault("age", null);
+		return (int) AGE_GROUPS.getOrDefault("age", 0);
 	}
 
 	public void setDateField(String fieldId, String dateString, String subType) {
