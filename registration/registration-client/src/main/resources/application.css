@@ -953,6 +953,15 @@ Working on new Css by taleev
 	-fx-min-width: 6em;
 }
 
+.bioGraphicFieldLabel {
+	-fx-background-color: #ffffff;
+	-fx-border-width: 0.0;
+	-fx-text-fill: #666666;
+	-fx-font-size: 1.3em;
+	-fx-min-width: 6em;
+	-fx-font-weight: bold;
+}
+
 .paginationLabel {
 	-fx-background-color: #ffffff;
 	-fx-text-fill: black;
@@ -1168,6 +1177,7 @@ Working on new Css by taleev
 	-fx-border-width: 5;
 	-fx-padding: -2.5;
 	-fx-border-radius: 3, 3, 3, 3;
+	-fx-alignment: CENTER-LEFT;
 }
 
 .fingerPrintPanesSelected {
@@ -1275,6 +1285,7 @@ Working on new Css by taleev
 .qualityBoxLabel {
 	-fx-text-fill: #666666;
 	-fx-font-size: 1.5em;
+	-fx-font-weight: bold;
 }
 
 .modalityLabel {
@@ -1299,8 +1310,9 @@ Working on new Css by taleev
 
 .biometricTypeLabel {
 	-fx-text-fill: #666666;
-	-fx-font-size: 1.2em;
+	-fx-font-size: 1.3em;
 	-fx-padding: 0px 0px 0px 60px ;
+	-fx-font-weight: bold;
 }
 
 .paneHeader {

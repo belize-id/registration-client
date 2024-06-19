@@ -1027,7 +1027,7 @@ public class GenericController<uiFieldDTO> extends BaseController {
 
 		fxControlMap.put(uiFieldDTO.getId(), fxControl);
 
-		fxControl.getNode().addEventHandler(MouseEvent.MOUSE_EXITED, event ->
+		fxControl.getNode().addEventHandler(MouseEvent.MOUSE_MOVED, event ->
 				handleContinueButton());
 		return fxControl;
 	}

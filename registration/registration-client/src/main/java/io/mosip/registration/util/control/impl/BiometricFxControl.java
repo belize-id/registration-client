@@ -189,7 +189,7 @@ public class BiometricFxControl extends FxControl {
 	private GridPane createGridPane() {
 		GridPane gridPane = new GridPane();
 		
-		gridPane.setPadding(new Insets(12, 0, 0, 0));
+		gridPane.setPadding(new Insets(2, 0, 0, 0));
 		RowConstraints topRowConstraints = new RowConstraints();
 		topRowConstraints.setPercentHeight(4);
 		RowConstraints midRowConstraints = new RowConstraints();

@@ -345,7 +345,7 @@ public class GenericBiometricsController extends BaseController {
 		checkBoxTitle.setText(applicationLabelBundle.getString("exceptionCheckBoxPaneLabel"));
 		exceptionImgVBox.setAlignment(Pos.CENTER);
 		exceptionImgVBox.getChildren().addAll(checkBoxTitle);
-		checkBoxTitle.getStyleClass().add("demoGraphicFieldLabel");
+		checkBoxTitle.getStyleClass().add("bioGraphicFieldLabel");
 
 		exceptionImgVBox.getChildren().add(
 				getExceptionImagePane(currentModality, configBioAttributes, nonConfigBioAttributes, fxControl.getUiSchemaDTO().getId()));
