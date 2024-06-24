@@ -51,6 +51,7 @@ import org.springframework.stereotype.Controller;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import netscape.javascript.JSObject;
 
 import static io.mosip.registration.constants.RegistrationConstants.*;
 
@@ -621,6 +622,9 @@ public class GenericController<uiFieldDTO> extends BaseController {
 				next.setVisible(newScreenName.equals("AUTH") ? false : true);
 				authenticate.setVisible(newScreenName.equals("AUTH") ? true : false);
 
+				//disable continue button in preview page
+				next.setDisable(newScreenName.equals("PREVIEW"));
+
 				if(oldValue.intValue() < 0) {
 					tabPane.getSelectionModel().selectFirst();
 					return;
@@ -940,7 +944,12 @@ public class GenericController<uiFieldDTO> extends BaseController {
 				break;
 		}
 	}
-
+	//click event handler from java script for check box
+	public class JavaBridge {
+		public void onCheckboxChange(boolean val) {
+			next.setDisable(!val);
+		}
+	}
 	private Node getPreviewContent(TabPane tabPane) throws Exception {
 		String content = registrationPreviewController.getPreviewContent();
 		if(content != null) {
@@ -949,6 +958,11 @@ public class GenericController<uiFieldDTO> extends BaseController {
 			webView.prefWidthProperty().bind(tabPane.widthProperty());
 			webView.prefHeightProperty().bind(tabPane.heightProperty());
 			webView.getEngine().loadContent(content);
+
+			//click event handler from java script for check box
+			JSObject window = (JSObject)  webView.getEngine().executeScript("window");
+			window.setMember("javaObject", new JavaBridge());
+
 			final GridPane gridPane = new GridPane();
 			gridPane.prefWidthProperty().bind(tabPane.widthProperty());
 			gridPane.prefHeightProperty().bind(tabPane.heightProperty());
