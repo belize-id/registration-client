@@ -409,6 +409,8 @@ public class TemplateGenerator extends BaseService {
 			templateValues.put(RegistrationConstants.TEMPLATE_RIGHT_PALM_LABEL, getLabel("righthandpalm"));
 			templateValues.put(RegistrationConstants.TEMPLATE_THUMBS_LABEL, getLabel("thumbs"));
 			templateValues.put("FaceLabel", getLabel("FACE"));
+			templateValues.put(RegistrationConstants.TEMPLATE_CONSENT_CHECK_BOX_CONTENT, getLabel("mosip.registration.consent"));
+			templateValues.put(RegistrationConstants.TEMPLATE_CONSENT_COSENT_LBL, getLabel("mosip.registration.consent.lbl"));
 
 			templateValues.put("LOGO1", getImage("/images/LOGO1.png"));
 			templateValues.put("LOGO2", getImage("/images/LOGO2.png"));

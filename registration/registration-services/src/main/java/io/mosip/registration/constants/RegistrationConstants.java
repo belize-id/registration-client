@@ -609,6 +609,9 @@ public class RegistrationConstants {
 	public static final String DEMOGRAPHIC_GROUP_LABEL = "demoGraphicCustomLabel";
 	public static final String DEMOGRAPHIC_FIELD = "demoGraphicCustomField";
 	public static final String DOCUMENT_COMBOBOX_FIELD = "documentCustomCombobox";
+	public static final String TEMPLATE_CONSENT_CHECK_BOX_CONTENT = "ConsentCheckBoxContent";
+	public static final String TEMPLATE_CONSENT_COSENT_LBL = "ConsentLabel";
+
 
 	public static final String MODIFY_DEMO_INFO = "modifyDemographicInfo";
 	public static final String MODIFY_DOCUMENTS = "modifyDocuments";
