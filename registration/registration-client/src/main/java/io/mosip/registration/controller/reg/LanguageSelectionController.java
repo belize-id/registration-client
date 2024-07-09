@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import io.mosip.registration.dto.mastersync.GenericDto;
 import io.mosip.registration.exception.PreConditionCheckException;
+import javafx.scene.control.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,9 +31,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -115,31 +113,37 @@ public class LanguageSelectionController extends BaseController implements Initi
 
 			selectLanguageText.setText(selectLangText.concat(RegistrationConstants.NEW_LINE));
 
+// Create a ToggleGroup to manage the radio buttons
+			ToggleGroup languageToggleGroup = new ToggleGroup();
+
 			for (GenericDto language : langCodes) {
-				CheckBox checkBox = new CheckBox();
-				checkBox.setId(language.getCode());
-				checkBox.setText(language.getName());
-				checkBox.getStyleClass().add("languageCheckBox");
-				
+				RadioButton radioButton = new RadioButton();
+				radioButton.setId(language.getCode());
+				radioButton.setText(language.getName());
+				radioButton.getStyleClass().add("languageCheckBox");
+
+				// Add the radio button to the ToggleGroup
+				radioButton.setToggleGroup(languageToggleGroup);
+
 				if (language.getCode().equalsIgnoreCase(language.getName())) {
-					checkBox.setDisable(true); //If ResourceBundle is not present for configured language, show the checkbox but disable it for selection
+					radioButton.setDisable(true); // If ResourceBundle is not present for configured language, show the radio button but disable it for selection
 				} else {
-					checkBox.selectedProperty().addListener((options, oldValue, newValue) -> {
+					radioButton.selectedProperty().addListener((options, oldValue, newValue) -> {
 						if (newValue) {
-							selectedLanguages.add(checkBox.getId());
+							selectedLanguages.add(radioButton.getId());
 							if (!mandatoryLangCodes.isEmpty() && mandatoryLangCodes.contains(language.getCode())) {
 								errorMessage.setVisible(false);
 							}
 						} else {
-							selectedLanguages.remove(checkBox.getId());
+							selectedLanguages.remove(radioButton.getId());
 							if (!mandatoryLangCodes.isEmpty()
 									&& !CollectionUtils.containsAny(selectedLanguages, mandatoryLangCodes)) {
 								errorMessage.setVisible(true);
 							}
 						}
 
-						//check if selected languages are as per the min and max lang count
-						//selected languages should contain all the mandatory languages
+						// Check if selected languages are as per the min and max lang count
+						// Selected languages should contain all the mandatory languages
 						if (selectedLanguages.size() >= minLangCount && selectedLanguages.size() <= maxLangCount
 								&& (mandatoryLangCodes.isEmpty() || (!mandatoryLangCodes.isEmpty() && selectedLanguages.containsAll(mandatoryLangCodes)))) {
 							submit.setDisable(false);
@@ -148,11 +152,13 @@ public class LanguageSelectionController extends BaseController implements Initi
 						}
 					});
 				}
+
 				if (language.getCode().equalsIgnoreCase(ApplicationContext.applicationLanguage()) || mandatoryLangCodes.contains(language.getCode())) {
-					checkBox.setSelected(true);
+					radioButton.setSelected(true);
 				}
-				checkBoxesPane.getChildren().add(checkBox);
+				checkBoxesPane.getChildren().add(radioButton);
 			}
+
 		} catch (PreConditionCheckException e) {
 			generateAlert(RegistrationConstants.ERROR, RegistrationUIConstants.getMessageLanguageSpecific(RegistrationUIConstants.UNABLE_LOAD_SCAN_POPUP));
 		}
