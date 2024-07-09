@@ -611,6 +611,7 @@ public class RegistrationConstants {
 	public static final String DOCUMENT_COMBOBOX_FIELD = "documentCustomCombobox";
 	public static final String TEMPLATE_CONSENT_CHECK_BOX_CONTENT = "ConsentCheckBoxContent";
 	public static final String TEMPLATE_CONSENT_COSENT_LBL = "ConsentLabel";
+	public static final String REG_ACK_PDF_TITLE = "AckTitle";
 
 
 	public static final String MODIFY_DEMO_INFO = "modifyDemographicInfo";
