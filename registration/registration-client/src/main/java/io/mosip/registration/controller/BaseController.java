@@ -342,7 +342,8 @@ public class BaseController {
 			RegistrationDTO registrationDTO = (RegistrationDTO) SessionContext.map()
 					.get(RegistrationConstants.REGISTRATION_DATA);
 			if (registrationDTO != null && registrationDTO.getSelectedLanguagesByApplicant() != null) {
-				langCode = registrationDTO.getSelectedLanguagesByApplicant().get(0);
+//				langCode = registrationDTO.getSelectedLanguagesByApplicant().get(0);
+                langCode = ApplicationContext.getInstance().getApplicationLanguage();
 			}
 		}
 		FXMLLoader loader = new FXMLLoader(url, ApplicationContext.getBundle(langCode, RegistrationConstants.LABELS));
@@ -356,7 +357,8 @@ public class BaseController {
 			RegistrationDTO registrationDTO = (RegistrationDTO) SessionContext.map()
 					.get(RegistrationConstants.REGISTRATION_DATA);
 			if (registrationDTO != null && registrationDTO.getSelectedLanguagesByApplicant() != null) {
-				langCode = registrationDTO.getSelectedLanguagesByApplicant().get(0);
+//				langCode = registrationDTO.getSelectedLanguagesByApplicant().get(0);
+                langCode = ApplicationContext.getInstance().getApplicationLanguage();
 			}
 		}
 		FXMLLoader loader = new FXMLLoader(url,

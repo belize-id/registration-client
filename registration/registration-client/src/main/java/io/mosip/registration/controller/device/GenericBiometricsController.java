@@ -1054,7 +1054,8 @@ public class GenericBiometricsController extends BaseController {
 
 		String langCode = ApplicationContext.applicationLanguage();
 		if (getRegistrationDTOFromSession() != null && getRegistrationDTOFromSession().getSelectedLanguagesByApplicant() != null) {
-			langCode = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant().get(0);
+//			langCode = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant().get(0);
+			langCode = ApplicationContext.getInstance().getApplicationLanguage();
 		}
 		thresholdLabel.setText(ApplicationContext.getBundle(langCode, RegistrationConstants.LABELS).getString("threshold").concat("  ").concat(String.valueOf(biometricThreshold))
 				.concat(RegistrationConstants.PERCENTAGE));
