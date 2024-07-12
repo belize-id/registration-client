@@ -536,7 +536,8 @@ public class TemplateGenerator extends BaseService {
 	}
 
 	private void setUpImportantGuidelines(Map<String, Object> templateValues) {
-		String guidelines = ApplicationContext.getStringValueFromApplicationMap(APPLICATION_IMPORTANT_GUIDELINES + ApplicationContext.applicationLanguage());
+//		String guidelines = ApplicationContext.getStringValueFromApplicationMap(APPLICATION_IMPORTANT_GUIDELINES + ApplicationContext.applicationLanguage());
+		String guidelines = ApplicationContext.getStringValueFromApplicationMap(APPLICATION_IMPORTANT_GUIDELINES + getRegistrationDTOFromSession().getSelectedLanguagesByApplicant().get(0));
 		String[] importantGuidelines = guidelines!=null ?
 				guidelines.split(RegistrationConstants.DELIMITER) : new String[]{};
 		templateValues.put(RegistrationConstants.TEMPLATE_GUIDELINES, Arrays.asList(importantGuidelines));
