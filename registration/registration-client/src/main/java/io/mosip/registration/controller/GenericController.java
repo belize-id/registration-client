@@ -15,6 +15,7 @@ import io.mosip.registration.dto.ErrorResponseDTO;
 import io.mosip.registration.dto.RegistrationDTO;
 import io.mosip.registration.dto.ResponseDTO;
 import io.mosip.registration.dto.SuccessResponseDTO;
+import io.mosip.registration.dto.mastersync.GenericDto;
 import io.mosip.registration.dto.schema.ProcessSpecDto;
 import io.mosip.registration.dto.schema.UiFieldDTO;
 import io.mosip.registration.dto.schema.UiScreenDTO;
@@ -176,7 +177,8 @@ public class GenericController<uiFieldDTO> extends BaseController {
 	}
 
 	private HBox getPreRegistrationFetchComponent() {
-		String langCode = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant().get(0);
+//		String langCode = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant().get(0);
+		String langCode = ApplicationContext.getInstance().getApplicationLanguage();
 
 		HBox hBox = new HBox();
 		hBox.setAlignment(Pos.CENTER_LEFT);
@@ -189,10 +191,11 @@ public class GenericController<uiFieldDTO> extends BaseController {
 		label.getStyleClass().add(LABEL_CLASS);
 		label.setId("preRegistrationLabel");
 		List<String> labels = new ArrayList<>();
-		getRegistrationDTOFromSession().getSelectedLanguagesByApplicant().forEach(lCode -> {
-			labels.add(ApplicationContext.getBundle(lCode, RegistrationConstants.LABELS)
+//		getRegistrationDTOFromSession().getSelectedLanguagesByApplicant().forEach(lCode -> {
+		String lCode = ApplicationContext.getInstance().getApplicationLanguage();
+		labels.add(ApplicationContext.getBundle(lCode, RegistrationConstants.LABELS)
 					.getString("search_for_Pre_registration_id"));
-		});
+//		});
 		String labelText = String.join(RegistrationConstants.SLASH, labels);
 		label.setText(labelText);
 		label.getStyleClass().add(RegistrationConstants.DEMOGRAPHIC_GROUP_LABEL);
@@ -874,6 +877,13 @@ public class GenericController<uiFieldDTO> extends BaseController {
 			screenTab.setContent(scrollPane);
 			tabPane.getTabs().add(screenTab);
 		}
+
+		List<GenericDto> languages = getConfiguredLanguagesForLogin();
+		String langCode = registrationDTO.getSelectedLanguagesByApplicant().get(0);
+		Optional<GenericDto> selectedLang =languages.stream().filter(lang->lang.getLangCode().equalsIgnoreCase(langCode)).findFirst();
+		String preferredLanguage = selectedLang.get().getName();
+
+		getRegistrationDTOFromSession().addDemographicField("preferredLang", preferredLanguage);
 
 		//Setting the Default Value
 		/*String langCode = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant().get(0);
