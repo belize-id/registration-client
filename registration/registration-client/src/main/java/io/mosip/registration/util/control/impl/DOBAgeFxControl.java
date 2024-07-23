@@ -106,15 +106,15 @@ public class DOBAgeFxControl extends FxControl {
 //						resourceBundle.getString("ageOrDOBField"), RegistrationConstants.DEMOGRAPHIC_FIELD_LABEL, true,
 //						ageVBox.getWidth()));
 
-		Label label = getLabel(uiFieldDTO.getId() + "OR" + RegistrationConstants.LABEL,
+		/*Label label = getLabel(uiFieldDTO.getId() + "OR" + RegistrationConstants.LABEL,
 				resourceBundle.getString("ageOrDOBField"), RegistrationConstants.DEMOGRAPHIC_FIELD_LABEL, true, dobHBox.getWidth());
 		label.setMinWidth(Region.USE_PREF_SIZE);
 		label.setAlignment(Pos.CENTER);
 		dobHBox.getChildren().add(label);
-		
-		/** Add Age Field */
+
+		*//** Add Age Field *//*
 		dobHBox.getChildren().add(addDateTextField(uiFieldDTO, RegistrationConstants.AGE_FIELD,
-				resourceBundle.getString(RegistrationConstants.AGE_FIELD)));
+				resourceBundle.getString(RegistrationConstants.AGE_FIELD)));*/
 
 //		/** YEARS Label */
 //		dobHBox.getChildren()
@@ -205,10 +205,10 @@ public class DOBAgeFxControl extends FxControl {
 				(TextField) getField(
 						uiFieldDTO.getId() + RegistrationConstants.YYYY + RegistrationConstants.TEXT_FIELD),
 				RegistrationConstants.YYYY);
-		addListener(
+		/*addListener(
 				(TextField) getField(
 						uiFieldDTO.getId() + RegistrationConstants.AGE_FIELD + RegistrationConstants.TEXT_FIELD),
-				RegistrationConstants.AGE_FIELD);
+				RegistrationConstants.AGE_FIELD);*/
 
 	}
 
