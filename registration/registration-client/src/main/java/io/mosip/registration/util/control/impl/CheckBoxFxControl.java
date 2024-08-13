@@ -56,7 +56,7 @@ public class CheckBoxFxControl extends FxControl {
 		VBox simpleTypeVBox = new VBox();
 		simpleTypeVBox.setId(fieldName + RegistrationConstants.VBOX);
 		simpleTypeVBox.setSpacing(5);
-
+		simpleTypeVBox.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 		List<String> labels = new ArrayList<>();
 		getRegistrationDTo().getSelectedLanguagesByApplicant().forEach(lCode -> {
 			labels.add(this.uiFieldDTO.getLabel().get(lCode));});
