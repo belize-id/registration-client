@@ -2762,6 +2762,16 @@ Working on new Css by taleev
     -fx-font-size: 1.1em;
 }
 
+.white-rounded-label {
+    -fx-background-color: white;
+    -fx-text-fill: white;
+    -fx-padding: 10px;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 15px;
+    -fx-font-weight: bold;
+    -fx-font-size: 1.1em;
+}
+
 .individual-quality-box {
-    -fx-padding: 20 0 0 0;
+    -fx-padding: 15 0 0 0;
 }
