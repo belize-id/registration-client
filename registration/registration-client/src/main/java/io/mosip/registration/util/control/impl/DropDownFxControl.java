@@ -2,6 +2,7 @@ package io.mosip.registration.util.control.impl;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import io.mosip.registration.controller.ClientApplication;
 import io.mosip.registration.dao.MasterSyncDao;
@@ -205,6 +206,10 @@ public class DropDownFxControl extends FxControl {
 				}
 				getRegistrationDTo().addDemographicField(uiFieldDTO.getId(), values);
 				getRegistrationDTo().SELECTED_CODES.put(uiFieldDTO.getId()+"Code", selectedCode);
+				if ((uiFieldDTO.getId().equalsIgnoreCase("statusInBelize") && selectedCode.equalsIgnoreCase("BB")) || ((uiFieldDTO.getId().equalsIgnoreCase("statusInBelize")) && !selectedCode.equalsIgnoreCase("BB"))) {
+					String langCode = getRegistrationDTo().getSelectedLanguagesByApplicant().get(0);
+					loadDependentDropdownCountryOfBirth(selectedCode, langCode);
+				}
 				break;
 			default:
 				Optional<GenericDto> result = getPossibleValues(getRegistrationDTo().getSelectedLanguagesByApplicant().get(0)).stream()
@@ -214,6 +219,38 @@ public class DropDownFxControl extends FxControl {
 					getRegistrationDTo().SELECTED_CODES.put(uiFieldDTO.getId()+"Code", selectedCode);
 				}
 				break;
+		}
+	}
+	private void loadDependentDropdownCountryOfBirth(String selectedCode, String langCode) {
+		List<GenericDto> countryOfBirthList = masterSyncService.getFieldValues("countryOfBirth", langCode, false);
+		FxControl countryOfBirthControl = GenericController.getFxControlMap().get("countryOfBirth");
+		if (countryOfBirthControl != null) {
+			Node node = countryOfBirthControl.getNode();
+			if (node instanceof VBox) {
+				VBox vbox = (VBox) node;
+				for (Node child : vbox.getChildren()) {
+					if (child instanceof ComboBox) {
+						try {
+							ComboBox<GenericDto> fieldComboBox;
+							fieldComboBox = (ComboBox<GenericDto>) child;
+							fieldComboBox.getItems().clear();
+							if (selectedCode.equalsIgnoreCase("BB")) {
+								List<GenericDto> filteredItems = countryOfBirthList.stream().filter(dto -> dto.getCode().equals("BLZ")).collect(Collectors.toList());
+								setItems(fieldComboBox, filteredItems);
+							} else {
+								List<GenericDto> filteredItems = countryOfBirthList.stream().filter(dto -> !dto.getCode().equals("BLZ")).collect(Collectors.toList());
+								setItems(fieldComboBox, filteredItems);
+							}
+						} catch (ClassCastException e) {
+							LOGGER.info("Error casting node to ComboBox<GenericDto>: " + e.getMessage());
+						}
+					}
+				}
+			} else {
+				LOGGER.info("Node is not an instance of VBox. Actual type: " + node.getClass().getName());
+			}
+		} else {
+			LOGGER.info("countryOfBirth control not found.");
 		}
 	}
 
