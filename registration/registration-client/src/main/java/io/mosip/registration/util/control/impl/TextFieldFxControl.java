@@ -243,11 +243,12 @@ public class TextFieldFxControl extends FxControl {
 //		fieldTitle.setText(String.join(RegistrationConstants.SLASH, labels)	+ getMandatorySuffix(uiFieldDTO));
 
 		Text labelsText = new Text(String.join(RegistrationConstants.SLASH, labels));
-		labelsText.setStyle("-fx-fill: black;-fx-font-weight: bold;-fx-font-size: 1.2em;");
+		labelsText.getStyleClass().add(RegistrationConstants.DEMOGRAPHIC_FIELD_LABEL);
 		fieldTitle.getChildren().add(labelsText);
 
+
 		Text suffixText = new Text(getMandatorySuffix(uiFieldDTO));
-		suffixText.setStyle("-fx-fill: red;-fx-font-weight: bold;-fx-font-size: 1.2em;");
+		suffixText.getStyleClass().add(RegistrationConstants.DEMOGRAPHIC_FIELD_LABEL_ASTERIK);
 		fieldTitle.getChildren().add(suffixText);
 
 		simpleTypeVBox.getChildren().add(vBox);

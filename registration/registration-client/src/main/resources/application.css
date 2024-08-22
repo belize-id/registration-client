@@ -938,19 +938,21 @@ Working on new Css by taleev
 }
 
 .demoGraphicFieldLabelOnType {
-	-fx-background-color: #ffffff;
-	-fx-border-width: 0.0;
-	-fx-text-fill: #22A8C9;
-	-fx-prompt-text-fill: #000000;
-	-fx-font-size: 1em;
+    -fx-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-size: 1.2em;
 }
 
 .demoGraphicFieldLabel {
-	-fx-background-color: #ffffff;
-	-fx-border-width: 0.0;
-	-fx-text-fill: #666666;
-	-fx-font-size: 1em;
-	-fx-min-width: 6em;
+    -fx-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-size: 1.2em;
+}
+
+.demoGraphicFieldLabelAsterisk {
+    -fx-fill: red;
+    -fx-font-weight: bold;
+    -fx-font-size: 1.2em;
 }
 
 .bioGraphicFieldLabel {

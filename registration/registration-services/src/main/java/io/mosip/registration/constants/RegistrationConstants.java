@@ -259,6 +259,7 @@ public class RegistrationConstants {
 	public static final String DOC_COMBO_BOX = "documentCombobox";
 	public static final String BUTTONS_LABEL = "buttonsLabel";
 	public static final String DEMOGRAPHIC_FIELD_LABEL = "demoGraphicFieldLabel";
+	public static final String DEMOGRAPHIC_FIELD_LABEL_ASTERIK = "demoGraphicFieldLabelAsterisk";
 	public static final String SCAN_VBOX = "scanVBox";
 	public static final String DOC_TEXT_FIELD = "documentTextField";
 	public static final String DOCUMENT_CONTENT_BUTTON = "documentContentButton";
