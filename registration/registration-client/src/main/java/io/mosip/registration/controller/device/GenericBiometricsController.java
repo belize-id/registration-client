@@ -873,7 +873,9 @@ public class GenericBiometricsController extends BaseController {
 						attribute, attempt));
 			}
 			String scoreStyleClass = "green-rounded-label";
-			if (score < thresholdValue) {
+			if (score.equals(0.0)) {
+				scoreStyleClass = "white-rounded-label";
+			} else if (score < thresholdValue) {
 				scoreStyleClass = "red-rounded-label";
 			}
 			String displayScore = String.valueOf(score);
