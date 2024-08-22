@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import io.mosip.registration.controller.ClientApplication;
 import io.mosip.registration.dao.MasterSyncDao;
 import javafx.geometry.Insets;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import org.springframework.context.ApplicationContext;
 
 import io.mosip.registration.dto.mastersync.GenericDto;
@@ -101,8 +103,11 @@ public class DropDownFxControl extends FxControl {
 		simpleTypeVBox.setId(fieldName + RegistrationConstants.VBOX);
 
 		/** Title label */
-		Label fieldTitle = getLabel(uiFieldDTO.getId() + RegistrationConstants.LABEL, "",
-				RegistrationConstants.DEMOGRAPHIC_FIELD_LABEL, true, simpleTypeVBox.getWidth());
+//		Label fieldTitle = getLabel(uiFieldDTO.getId() + RegistrationConstants.LABEL, "",
+//				RegistrationConstants.DEMOGRAPHIC_FIELD_LABEL, true, simpleTypeVBox.getWidth());
+//		simpleTypeVBox.getChildren().add(fieldTitle);
+
+		TextFlow fieldTitle = new TextFlow();
 		simpleTypeVBox.getChildren().add(fieldTitle);
 
 		List<String> labels = new ArrayList<>();
@@ -111,6 +116,16 @@ public class DropDownFxControl extends FxControl {
 		});
 
 		String titleText = String.join(RegistrationConstants.SLASH, labels) + getMandatorySuffix(uiFieldDTO);
+
+
+		Text labelsText = new Text(String.join(RegistrationConstants.SLASH, labels));
+		labelsText.setStyle("-fx-fill: black;-fx-font-weight: bold;-fx-font-size: 1.2em;");
+		fieldTitle.getChildren().add(labelsText);
+
+		Text suffixText = new Text(getMandatorySuffix(uiFieldDTO));
+		suffixText.setStyle("-fx-fill: red;-fx-font-weight: bold;-fx-font-size: 1.2em;");
+		fieldTitle.getChildren().add(suffixText);
+
 		ComboBox<GenericDto> comboBox = getComboBox(fieldName, titleText, RegistrationConstants.DOC_COMBO_BOX,
 				simpleTypeVBox.getPrefWidth(), false);
 		comboBox.setMaxWidth(Double.MAX_VALUE);
@@ -131,7 +146,7 @@ public class DropDownFxControl extends FxControl {
 
 		setListener(comboBox);
 
-		fieldTitle.setText(titleText);
+//		fieldTitle.setText(titleText);
 		Label messageLabel = getLabel(uiFieldDTO.getId() + RegistrationConstants.MESSAGE, null,
 				RegistrationConstants.DEMOGRAPHIC_FIELD_LABEL, false, simpleTypeVBox.getPrefWidth());
 		messageLabel.setMaxWidth(200);
@@ -284,7 +299,7 @@ public class DropDownFxControl extends FxControl {
 	public void setListener(Node node) {
 		ComboBox<GenericDto> fieldComboBox = (ComboBox<GenericDto>) node;
 		fieldComboBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
-			displayFieldLabel();
+//			displayFieldLabel();
 			if (isValid()) {
 
 				List<String> toolTipText = new ArrayList<>();

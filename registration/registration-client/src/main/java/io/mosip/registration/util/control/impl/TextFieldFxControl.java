@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import io.mosip.registration.controller.*;
 import javafx.geometry.Insets;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import org.springframework.context.ApplicationContext;
 
 import io.mosip.commons.packet.dto.packet.SimpleDto;
@@ -132,7 +134,7 @@ public class TextFieldFxControl extends FxControl {
 
 	@Override
 	public void setListener(Node node) {
-		FXUtils.getInstance().onTypeFocusUnfocusListener((Pane) getNode(), (TextField) node);
+//		FXUtils.getInstance().onTypeFocusUnfocusListener((Pane) getNode(), (TextField) node);
 
 		TextField textField = (TextField) node;
 
@@ -166,10 +168,13 @@ public class TextFieldFxControl extends FxControl {
 		simpleTypeVBox.setSpacing(5);
 
 		/** Title label */
-		Label fieldTitle = getLabel(uiFieldDTO.getId() + RegistrationConstants.LABEL, "",
-				RegistrationConstants.DEMOGRAPHIC_FIELD_LABEL, true, simpleTypeVBox.getWidth());
-		changeNodeOrientation(fieldTitle, getRegistrationDTo().getSelectedLanguagesByApplicant().get(0));
+//		Label fieldTitle = getLabel(uiFieldDTO.getId() + RegistrationConstants.LABEL, "",
+//				RegistrationConstants.DEMOGRAPHIC_FIELD_LABEL, true, simpleTypeVBox.getWidth());
+//		changeNodeOrientation(fieldTitle, getRegistrationDTo().getSelectedLanguagesByApplicant().get(0));
 
+//		simpleTypeVBox.getChildren().add(fieldTitle);
+
+		TextFlow fieldTitle = new TextFlow();
 		simpleTypeVBox.getChildren().add(fieldTitle);
 
 		VBox vBox = new VBox();
@@ -235,7 +240,16 @@ public class TextFieldFxControl extends FxControl {
 				break;
 		}
 
-		fieldTitle.setText(String.join(RegistrationConstants.SLASH, labels)	+ getMandatorySuffix(uiFieldDTO));
+//		fieldTitle.setText(String.join(RegistrationConstants.SLASH, labels)	+ getMandatorySuffix(uiFieldDTO));
+
+		Text labelsText = new Text(String.join(RegistrationConstants.SLASH, labels));
+		labelsText.setStyle("-fx-fill: black;-fx-font-weight: bold;-fx-font-size: 1.2em;");
+		fieldTitle.getChildren().add(labelsText);
+
+		Text suffixText = new Text(getMandatorySuffix(uiFieldDTO));
+		suffixText.setStyle("-fx-fill: red;-fx-font-weight: bold;-fx-font-size: 1.2em;");
+		fieldTitle.getChildren().add(suffixText);
+
 		simpleTypeVBox.getChildren().add(vBox);
         simpleTypeVBox.setMargin(vBox, new Insets(0, 30, 0, 0));
 		return simpleTypeVBox;
@@ -269,7 +283,7 @@ public class TextFieldFxControl extends FxControl {
 				}
 
 				if (isValid()) {
-					FXUtils.getInstance().setTextValidLabel((Pane) getNode(), textField, uiFieldDTO.getId());
+//					FXUtils.getInstance().setTextValidLabel((Pane) getNode(), textField, uiFieldDTO.getId());
 					setData(null);
 					// handling other handlers
 					demographicChangeActionHandler.actionHandle((Pane) getNode(), node.getId(),
@@ -375,7 +389,7 @@ public class TextFieldFxControl extends FxControl {
 			
 			if (validation.validateTextField((Pane) getNode(), textField, uiFieldDTO.getId(), true, langCode)) {
 				if (validation.validateForBlockListedWords((Pane) getNode(), textField, uiFieldDTO.getId(), true, langCode)) {
-					FXUtils.getInstance().setTextValidLabel((Pane) getNode(), textField, uiFieldDTO.getId());
+//					FXUtils.getInstance().setTextValidLabel((Pane) getNode(), textField, uiFieldDTO.getId());
 					getField(uiFieldDTO.getId() + langCode + "HyperlinkHBox").setVisible(false);
 				} else {
 					FXUtils.getInstance().showErrorLabel(textField, (Pane) getNode());

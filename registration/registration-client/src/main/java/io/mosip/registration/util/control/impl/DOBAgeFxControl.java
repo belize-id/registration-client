@@ -9,6 +9,8 @@ import java.util.ResourceBundle;
 
 import io.mosip.registration.controller.ClientApplication;
 import javafx.geometry.Insets;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import org.springframework.context.ApplicationContext;
 
 import io.mosip.kernel.core.logger.spi.Logger;
@@ -87,8 +89,18 @@ public class DOBAgeFxControl extends FxControl {
 		});
 
 		/** DOB Label */
-		ageVBox.getChildren().add(getLabel(uiFieldDTO.getId() + RegistrationConstants.LABEL,
-				String.join(RegistrationConstants.SLASH, labels) + mandatorySuffix, RegistrationConstants.DEMOGRAPHIC_FIELD_LABEL, true, ageVBox.getWidth()));
+//		ageVBox.getChildren().add(getLabel(uiFieldDTO.getId() + RegistrationConstants.LABEL,
+//				String.join(RegistrationConstants.SLASH, labels) + mandatorySuffix, RegistrationConstants.DEMOGRAPHIC_FIELD_LABEL, true, ageVBox.getWidth()));
+
+		TextFlow fieldTitle = new TextFlow();
+		Text labelsText = new Text(String.join(RegistrationConstants.SLASH, labels));
+		labelsText.setStyle("-fx-fill: black;-fx-font-weight: bold;-fx-font-size: 1.2em;");
+		fieldTitle.getChildren().add(labelsText);
+
+		Text suffixText = new Text(getMandatorySuffix(uiFieldDTO));
+		suffixText.setStyle("-fx-fill: red;-fx-font-weight: bold;-fx-font-size: 1.2em;");
+		fieldTitle.getChildren().add(suffixText);
+		ageVBox.getChildren().add(fieldTitle);
 
 		/** Add Date */
 		dobHBox.getChildren().add(addDateTextField(uiFieldDTO, RegistrationConstants.DD,
