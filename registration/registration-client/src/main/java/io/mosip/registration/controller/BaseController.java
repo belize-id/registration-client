@@ -1433,7 +1433,7 @@ public class BaseController {
 					.format(DateTimeFormatter.ofPattern(RegistrationConstants.UTC_PATTERN));
 			LocalDateTime dateTime = DateUtils.parseUTCToLocalDateTime(formattedTime);
 			return dateTime
-					.format(DateTimeFormatter.ofPattern(RegistrationConstants.ONBOARD_LAST_BIOMETRIC_UPDTAE_FORMAT));
+					.format(DateTimeFormatter.ofPattern(RegistrationConstants.ONBOARD_LAST_BIOMETRIC_UPDTAE_FORMAT,Locale.FRENCH));
 		} catch (RuntimeException exception) {
 			LOGGER.error("REGISTRATION - ALERT - BASE_CONTROLLER", APPLICATION_NAME, APPLICATION_ID,
 					ExceptionUtils.getStackTrace(exception));
