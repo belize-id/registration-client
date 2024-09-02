@@ -1,9 +1,7 @@
 package io.mosip.registration.ref.morena;
 
-import eu.gnome.morena.Camera;
-import eu.gnome.morena.Device;
-import eu.gnome.morena.Manager;
-import eu.gnome.morena.Scanner;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.gnome.morena.*;
 import io.mosip.registration.api.docscanner.DeviceType;
 import io.mosip.registration.api.docscanner.DocScannerService;
 import io.mosip.registration.api.docscanner.dto.DocScanDevice;
@@ -42,6 +40,8 @@ public class MorenaDocScanServiceImpl implements DocScannerService {
                 Device device = result.get();
                 if(device instanceof Scanner) {
                     Scanner scanner = (Scanner) device;
+                    ObjectMapper mapper= new ObjectMapper();
+                    LOGGER.info("Device Values::", mapper.writeValueAsString(device));
                     scanner.setMode(Scanner.RGB_8);
                     scanner.setResolution(docScanDevice.getDpi());
                     scanner.setFrame(docScanDevice.getFrame()[0], docScanDevice.getFrame()[1],
