@@ -40,12 +40,13 @@ public class MorenaDocScanServiceImpl implements DocScannerService {
                 Device device = result.get();
                 if(device instanceof Scanner) {
                     Scanner scanner = (Scanner) device;
-                    ObjectMapper mapper= new ObjectMapper();
-                    LOGGER.info("Device Values::", mapper.writeValueAsString(device));
                     scanner.setMode(Scanner.RGB_8);
+                    LOGGER.info("DPI >>> {}", docScanDevice.getDpi());
                     scanner.setResolution(docScanDevice.getDpi());
-                    scanner.setFrame(docScanDevice.getFrame()[0], docScanDevice.getFrame()[1],
-                            docScanDevice.getFrame()[2], docScanDevice.getFrame()[3]);
+                    if(docScanDevice.getFrame() != null && docScanDevice.getFrame().length > 3) {
+                        scanner.setFrame(docScanDevice.getFrame()[0], docScanDevice.getFrame()[1],
+                                docScanDevice.getFrame()[2], docScanDevice.getFrame()[3]);
+                    }
                 }
 
                 if(device instanceof Camera) {
